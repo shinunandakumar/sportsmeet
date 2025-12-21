@@ -3,6 +3,9 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 
 
+# -----------------------------
+# USER ROLE
+# -----------------------------
 class UserRole(models.TextChoices):
     ADMIN = "ADMIN", "Admin"
     FACULTY_COORDINATOR = "FACULTY_COORDINATOR", "Faculty Coordinator"
@@ -11,6 +14,17 @@ class UserRole(models.TextChoices):
     STUDENT = "STUDENT", "Student"
 
 
+# -----------------------------
+# GENDER
+# -----------------------------
+class Gender(models.TextChoices):
+    MALE = "MALE", "Male"
+    FEMALE = "FEMALE", "Female"
+
+
+# -----------------------------
+# USER MANAGER
+# -----------------------------
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -38,13 +52,12 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        if extra_fields.get("is_staff") is not True:
-            raise ValueError("Superuser must have is_staff=True.")
-        if extra_fields.get("is_superuser") is not True:
-            raise ValueError("Superuser must have is_superuser=True.")
         return self._create_user(email, password, **extra_fields)
 
 
+# -----------------------------
+# DEPARTMENT
+# -----------------------------
 class Department(models.Model):
     name = models.CharField(max_length=255, unique=True)
     faculty_coordinator = models.OneToOneField(
@@ -66,6 +79,9 @@ class Department(models.Model):
         return self.name
 
 
+# -----------------------------
+# USER (ONLY ONE!)
+# -----------------------------
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     full_name = models.CharField(max_length=255, blank=True)
@@ -75,7 +91,20 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=True,
         blank=True
     )
-    role = models.CharField(max_length=32, choices=UserRole.choices, default=UserRole.STUDENT)
+
+    role = models.CharField(
+        max_length=32,
+        choices=UserRole.choices,
+        default=UserRole.STUDENT
+    )
+
+    gender = models.CharField(
+        max_length=10,
+        choices=Gender.choices,
+        null=True,
+        blank=True
+    )
+
     department = models.ForeignKey(
         Department,
         null=True,

@@ -14,6 +14,9 @@ services:
     build: .
     env_file:
       - .env
+    environment:
+      DB_HOST: db          # ✅ ADD THIS
+      DB_PORT: 5432        # ✅ ADD THIS
     volumes:
       - .:/app
     ports:
@@ -23,3 +26,4 @@ services:
 
 volumes:
   pgdata:
+

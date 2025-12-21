@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Dashboard</title>
+</head>
+<body>
+
+<h1>👨‍🏫 Faculty Dashboard</h1>
+<p>Welcome {{ request.user.full_name|default:request.user.email }}</p>
+
+<h3>Active Events</h3>
+
+{% if events %}
+<ul>
+    {% for event in events %}
+        <li>
+            {{ event.meet.name }} – {{ event.name }}
+            ({{ event.get_event_type_display }})
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No active events.</p>
+{% endif %}
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+
+</body>
+</html>

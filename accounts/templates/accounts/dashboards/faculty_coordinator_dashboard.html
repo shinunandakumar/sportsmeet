@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Faculty Coordinator Dashboard</title>
+</head>
+<body>
+
+<h1>🧑‍💼 Faculty Coordinator Dashboard</h1>
+
+<h3>All Events</h3>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Meet</th>
+        <th>Event</th>
+        <th>Gender</th>
+        <th>Registrations</th>
+    </tr>
+
+    {% for event in events %}
+    <tr>
+        <td>{{ event.meet.name }}</td>
+        <td>{{ event.name }}</td>
+        <td>{{ event.get_gender_display }}</td>
+        <td>{{ event.registrations.count }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+
+</body>
+</html>

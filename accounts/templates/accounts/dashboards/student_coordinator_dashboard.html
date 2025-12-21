@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Coordinator Dashboard</title>
+</head>
+<body>
+
+<h1>🧑‍🎓 Student Coordinator Dashboard</h1>
+
+<h3>Student Registrations</h3>
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Student</th>
+        <th>Register No</th>
+        <th>Event</th>
+        <th>Meet</th>
+    </tr>
+
+    {% for reg in registrations %}
+    <tr>
+        <td>{{ reg.participant.full_name }}</td>
+        <td>{{ reg.participant.register_number }}</td>
+        <td>{{ reg.event.name }}</td>
+        <td>{{ reg.event.meet.name }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+
+</body>
+</html>

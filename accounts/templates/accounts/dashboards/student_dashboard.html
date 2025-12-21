@@ -1,0 +1,53 @@
+<h3>🏆 Participated Events</h3>
+
+{% if registrations %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Meet</th>
+        <th>Event</th>
+        <th>Type</th>
+        <th>Status</th>
+    </tr>
+    {% for reg in registrations %}
+    <tr>
+        <td>{{ reg.event.meet.name }}</td>
+        <td>{{ reg.event.name }}</td>
+        <td>{{ reg.event.get_event_type_display }}</td>
+        <td>{{ reg.event.get_status_display }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No events registered yet.</p>
+{% endif %}
+
+<hr>
+
+<h3>📝 Available Events for Registration</h3>
+
+{% if available_events %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Meet</th>
+        <th>Event</th>
+        <th>Type</th>
+        <th>Gender</th>
+        <th>Action</th>
+    </tr>
+    {% for event in available_events %}
+    <tr>
+        <td>{{ event.meet.name }}</td>
+        <td>{{ event.name }}</td>
+        <td>{{ event.get_event_type_display }}</td>
+        <td>{{ event.get_gender_display }}</td>
+        <td>
+            <a href="{% url 'accounts:student_register_event' event.id %}">
+                Register
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No events available for registration.</p>
+{% endif %}

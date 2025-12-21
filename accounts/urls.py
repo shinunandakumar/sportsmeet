@@ -1,34 +1,90 @@
 from django.urls import path
-from .views import home, student_bulk_upload, student_search, student_list,add_student_to_event, register_existing_student,  add_new_student_and_register, coordinator_events, event_student_report
+from . import views
 
 app_name = "accounts"
 
 urlpatterns = [
-    path("", home, name="home"),
-    path("students/", student_list, name="student_list"),
-    path("students/upload/", student_bulk_upload, name="student_bulk_upload"),
-    path("students/search/", student_search, name="student_search"),
-]
-urlpatterns += [
+    # -------------------------
+    # Auth
+    # -------------------------
+    path("", views.home, name="home"),
+    path("login/", views.login_view, name="login"),
+    path("logout/", views.logout_view, name="logout"),
+
+    # -------------------------
+    # Student management
+    # -------------------------
+    path("students/", views.student_list, name="student_list"),
+    path("students/upload/", views.student_bulk_upload, name="student_bulk_upload"),
+    path("students/search/", views.student_search, name="student_search"),
+
+    # -------------------------
+    # Event & registration
+    # -------------------------
     path(
         "events/<int:event_id>/add-students/",
-        add_student_to_event,
+        views.add_student_to_event,
         name="add_student_to_event",
     ),
     path(
         "events/<int:event_id>/add-existing/<int:student_id>/",
-        register_existing_student,
+        views.register_existing_student,
         name="register_existing_student",
     ),
     path(
         "events/<int:event_id>/add-new/",
-        add_new_student_and_register,
+        views.add_new_student_and_register,
         name="add_new_student_and_register",
     ),
-    path("coordinator/events/", coordinator_events, name="coordinator_events"),
+
+    # -------------------------
+    # Student self-registration
+    # -------------------------
+    path(
+        "student/register-event/<int:event_id>/",
+        views.student_register_event,
+        name="student_register_event",
+    ),
+
+    # -------------------------
+    # Coordinator
+    # -------------------------
+    path(
+        "coordinator/events/",
+        views.coordinator_events,
+        name="coordinator_events",
+    ),
+
+    # -------------------------
+    # Reports
+    # -------------------------
     path(
         "reports/event-students/",
-        event_student_report,
+        views.event_student_report,
         name="event_student_report",
+    ),
+
+    # -------------------------
+    # Dashboards
+    # -------------------------
+    path(
+        "student/dashboard/",
+        views.student_dashboard,
+        name="student_dashboard",
+    ),
+    path(
+        "student-coordinator/dashboard/",
+        views.student_coordinator_dashboard,
+        name="student_coordinator_dashboard",
+    ),
+    path(
+        "faculty/dashboard/",
+        views.faculty_dashboard,
+        name="faculty_dashboard",
+    ),
+    path(
+        "faculty-coordinator/dashboard/",
+        views.faculty_coordinator_dashboard,
+        name="faculty_coordinator_dashboard",
     ),
 ]
