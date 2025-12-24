@@ -26,6 +26,15 @@ def is_admin_or_coordinator(user):
     ]
 
 
+def get_user_department(user):
+    if user.role in (
+        UserRole.FACULTY_COORDINATOR,
+        UserRole.STUDENT_COORDINATOR,
+    ):
+        return user.department
+    return None
+
+
 @login_required
 def student_bulk_upload(request):
     if not is_admin_or_coordinator(request.user):
@@ -73,10 +82,14 @@ def student_search(request):
         return HttpResponseForbidden("Not allowed")
 
     query = request.GET.get("q", "")
+    
+    dept = get_user_department(request.user)
+    students = User.objects.filter(role=UserRole.STUDENT)
+    
+    if dept:
+        students = students.filter(department=dept)
 
-    students = User.objects.filter(
-        role=UserRole.STUDENT
-    ).filter(
+    students = students.filter(
         Q(full_name__icontains=query) |
         Q(register_number__icontains=query)
     )
@@ -98,8 +111,12 @@ def student_search(request):
 def student_list(request):
     if not is_admin_or_coordinator(request.user):
         return HttpResponseForbidden("Not allowed")
-
+    
+    dept = get_user_department(request.user)
     students = User.objects.filter(role=UserRole.STUDENT)
+    
+    if dept:
+        students = students.filter(department=dept)
 
     return render(
         request,
@@ -117,11 +134,16 @@ def add_student_to_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     query = request.GET.get("q", "")
     students = []
+    
+    dept = get_user_department(request.user)
 
     if query:
-        students = User.objects.filter(
-            role=UserRole.STUDENT
-        ).filter(
+        students = User.objects.filter(role=UserRole.STUDENT)
+        
+        if dept:
+            students = students.filter(department=dept)
+            
+        students = students.filter(
             Q(full_name__icontains=query) |
             Q(register_number__icontains=query)
         )
@@ -143,6 +165,7 @@ def add_student_to_event(request, event_id):
 def register_existing_student(request, event_id, student_id):
     if not is_admin_or_coordinator(request.user):
         return HttpResponseForbidden("Not allowed")
+    
 
     event = get_object_or_404(Event, id=event_id)
 
@@ -150,6 +173,14 @@ def register_existing_student(request, event_id, student_id):
         return HttpResponseForbidden("Event is not active")
 
     student = get_object_or_404(User, id=student_id, role=UserRole.STUDENT)
+    
+    if request.user.role in (
+        UserRole.FACULTY_COORDINATOR,
+        UserRole.STUDENT_COORDINATOR,
+    ):
+        if student.department != request.user.department:
+            return HttpResponseForbidden("Not Allowed")
+        
 
     Registration.objects.get_or_create(
         event=event,
@@ -175,9 +206,19 @@ def add_new_student_and_register(request, event_id):
     if event.status != "ACTIVE":
         return HttpResponseForbidden("Event is not active")
 
+
     form = ManualStudentAddForm(request.POST)
     if form.is_valid():
-        student = form.save()
+        student = form.save(commit=False)
+        
+        if request.user.role in (
+            UserRole.FACULTY_COORDINATOR,
+            UserRole.STUDENT_COORDINATOR,
+        ):
+            student.department = request.user.department
+            
+        student.save()
+        
         Registration.objects.get_or_create(
             event=event,
             participant=student,
@@ -239,3 +280,23 @@ def event_student_report(request):
             "query": query,
         }
     )
+
+
+@login_required
+def faculty_dashboard(request):
+    if request.user.role != UserRole.FACULTY_COORDINATOR:
+        return HttpResponseForbidden("Not allowed")
+    
+    department = request.user.department
+    
+    return render(request, "accounts/faculty_dashboard.html", {'department': department})
+
+
+@login_required
+def student_coordinator_dashboard(request):
+    if request.user.role != UserRole.STUDENT_COORDINATOR:
+        return HttpResponseForbidden("Not Allowed")
+    
+    department = request.user.department
+    
+    return render(request, "accounts/student_coordinator_dashboard.html", {"department": department})

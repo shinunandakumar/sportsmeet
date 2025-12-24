@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Coordinator Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+        }
+        .container {
+            width: 650px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+        }
+        h2 {
+            text-align: center;
+        }
+        .section {
+            margin-top: 30px;
+        }
+        .btn {
+            display: block;
+            padding: 12px;
+            margin: 10px 0;
+            text-decoration: none;
+            background: #198754;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .btn:hover {
+            background: #146c43;
+        }
+        .muted {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>🎓 Student Coordinator Dashboard</h2>
+    <p class="muted">
+        Department: <strong>{{ department.name }}</strong>
+    </p>
+
+    <div class="section">
+        <h3>👥 Student Management</h3>
+        <a class="btn" href="{% url 'accounts:student_list' %}">
+            View Department Students
+        </a>
+        <a class="btn" href="{% url 'accounts:student_search' %}">
+            Search Students
+        </a>
+    </div>
+
+    <div class="section">
+        <h3>🏟️ Event Management</h3>
+        <a class="btn" href="{% url 'accounts:coordinator_events' %}">
+            Add Students to Events
+        </a>
+        <a class="btn" href="{% url 'accounts:event_student_report' %}">
+            View Event Registrations
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -106,8 +106,19 @@ class UserAdmin(RoleAdminPermissionMixin, DjangoUserAdmin):
 
     def has_change_permission(self, request, obj=None):
         role = self._role(request)
+
         if role == UserRole.ADMIN:
             return True
+
+        if role == UserRole.FACULTY_COORDINATOR and obj:
+            return (
+                obj.department == request.user.department
+                and obj.role in (
+                    UserRole.STUDENT,
+                    UserRole.STUDENT_COORDINATOR,
+                )
+            )
+
         return False
 
     def has_delete_permission(self, request, obj=None):
@@ -116,9 +127,55 @@ class UserAdmin(RoleAdminPermissionMixin, DjangoUserAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         role = self._role(request)
+
         if role == UserRole.ADMIN:
             return ()
-        return ("email", "role", "department", "is_active", "is_staff", "is_superuser", "groups", "user_permissions")
+
+        if role == UserRole.FACULTY_COORDINATOR:
+            return (
+                "email",
+                "is_active",
+                "is_staff",
+                "is_superuser",
+                "groups",
+                "user_permissions",
+            )
+
+        return super().get_readonly_fields(request, obj)
+
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        role = self._role(request)
+        
+        if db_field.name == "department" and role == UserRole.FACULTY_COORDINATOR:
+            kwargs["queryset"] = Department.objects.filter(
+                id=request.user.department_id
+            )
+        
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+    
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        role = self._role(request)
+        
+        if role == UserRole.FACULTY_COORDINATOR:
+            return qs.filter(department=request.user.department)
+        
+        return qs
+    
+    
+    def formfield_for_choice_field(self, db_field, request, **kwargs):
+        role = self._role(request)
+        
+        if db_field.name == "role" and role == UserRole.FACULTY_COORDINATOR:
+            kwargs["choices"] = [
+                (UserRole.STUDENT, "Student"),
+                (UserRole.STUDENT_COORDINATOR, "Student Coordinator"), #only assign student coordinator
+            ]
+        
+        return super().formfield_for_choice_field(db_field, request, **kwargs)
+    
     
     
     def save_model(self, request, obj, form, change):
@@ -144,4 +201,3 @@ class UserAdmin(RoleAdminPermissionMixin, DjangoUserAdmin):
 
             obj.department.student_coordinator = obj
             obj.department.save()
-
