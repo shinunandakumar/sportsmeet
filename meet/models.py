@@ -31,6 +31,10 @@ class Meet(models.Model):
 
 
 
+class EventGender(models.TextChoices):
+    BOYS = "BOYS", "Boys"
+    GIRLS = "GIRLS", "Girls"
+
 
 
 class Event(models.Model):
@@ -41,6 +45,11 @@ class Event(models.Model):
     )
     name = models.CharField(max_length=255)
     event_type = models.CharField(max_length=16, choices=EventType.choices, default=EventType.OTHER)
+    gender = models.CharField(
+        max_length=10,
+        choices=EventGender.choices,
+        default=EventGender.BOYS
+    )
     status = models.CharField(max_length=16, choices=EventStatus.choices, default=EventStatus.ACTIVE)
 
     class Meta:

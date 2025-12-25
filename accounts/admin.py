@@ -68,13 +68,28 @@ class UserAdmin(RoleAdminPermissionMixin, DjangoUserAdmin):
     model_key = "user"
 
     ordering = ("email",)
-    list_display = ("email", "role", "department", "is_active", "is_staff")
+    list_display = (
+        "email",
+        "register_number",
+        "role",
+        "department",
+        "is_active",
+        "is_staff",
+    )
+
     list_filter = ("role", "department", "is_active")
-    search_fields = ("email",)
+    search_fields = ("email", "register_number", "full_name")
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (_("Profile"), {"fields": ("role", "department")}),
+        (_("Profile"), {
+            "fields": (
+                "full_name",
+                "register_number",
+                "role",
+                "department",
+            )
+        }),
         (
             _("Permissions"),
             {
@@ -95,7 +110,16 @@ class UserAdmin(RoleAdminPermissionMixin, DjangoUserAdmin):
             None,
             {
                 "classes": ("wide",),
-                "fields": ("email", "password1", "password2", "role", "department", "is_active"),
+                "fields": (
+                    "email",
+                    "full_name",
+                    "register_number",
+                    "password1",
+                    "password2",
+                    "role",
+                    "department",
+                    "is_active",
+                ),
             },
         ),
     )

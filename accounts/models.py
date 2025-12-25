@@ -64,6 +64,12 @@ class Department(models.Model):
 
     def __str__(self):
         return self.name
+    
+    
+
+class Gender(models.TextChoices):
+    MALE = "MALE", "Male"
+    FEMALE = "FEMALE", "Female"
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -76,6 +82,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True
     )
     role = models.CharField(max_length=32, choices=UserRole.choices, default=UserRole.STUDENT)
+    gender = models.CharField(
+        max_length=32,
+        choices=Gender.choices,
+        null=True,
+        blank=True
+    )
     department = models.ForeignKey(
         Department,
         null=True,
